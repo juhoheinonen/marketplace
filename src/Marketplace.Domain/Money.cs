@@ -1,31 +1,19 @@
-using System;
+using Marketplace.Framework;
 
 namespace Marketplace.Domain
 {
-    public class Money: IEquatable<Money>
+    public class Money: Value<Money>
     {
         public decimal Amount { get; }
 
         public Money(decimal amount) => Amount = amount;
 
-        public bool Equals(Money other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Amount == other.Amount;
-        }
+        public Money Add(Money summand) => new(Amount + summand.Amount);
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Money) obj);
-        }
+        public Money Subtract(Money subtrahend) => new(Amount - subtrahend.Amount);
 
-        public override int GetHashCode()
-        {
-            return Amount.GetHashCode();
-        }
+        public static Money operator +(Money summand1, Money summand2) => summand1.Add(summand2);
+
+        public static Money operator -(Money minuend, Money subtrahend) => minuend.Subtract(subtrahend);
     }
 }
