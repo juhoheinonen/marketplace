@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Marketplace.Framework;
 
 namespace Marketplace.Domain
 {
-    public class ClassifiedAd
+    public class ClassifiedAd: Entity
     {
         public ClassifiedAdId Id { get; }
 
@@ -24,12 +24,22 @@ namespace Marketplace.Domain
             OwnerId = ownerId;
             State = ClassifiedAdState.Inactive;
             EnsureValidState();
+
+            Raise(new Events.ClassifiedAdCreated {
+                Id = id,
+                OwnerId = ownerId
+            });
         }
 
         public void SetTitle(ClassifiedAdTitle title)
         {
             Title = title;
             EnsureValidState();
+
+            Raise(new Events.ClassifiedAdTitleChanged {
+                Id = Id,
+                Title = title
+            });
         }
 
         public void UpdateText(ClassifiedAdText text)

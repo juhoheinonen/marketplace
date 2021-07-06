@@ -18,6 +18,8 @@ namespace Marketplace.Domain
             return new ClassifiedAdTitle(Regex.Replace(supportedTagsReplaced, "<.*?>", string.Empty));
         }
 
+        public static implicit operator string(ClassifiedAdTitle self) => self._value;
+
         private readonly string _value;
 
         private ClassifiedAdTitle(string value)
