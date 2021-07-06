@@ -9,7 +9,7 @@ namespace Marketplace.Domain
 
         public static Money FromDecimal(decimal amount, string currency, ICurrencyLookup currencyLookup) => new(amount, currency, currencyLookup);
 
-        public static Money FromString(string amount, string currency, ICurrencyLookup currencyLookup) => 
+        public static Money FromString(string amount, string currency, ICurrencyLookup currencyLookup) =>
             new(decimal.Parse(amount), currency, currencyLookup);
 
         protected Money(decimal amount, string currencyCode, ICurrencyLookup currencyLookup)
@@ -64,7 +64,7 @@ namespace Marketplace.Domain
             }
 
             return new(Amount - subtrahend.Amount, Currency);
-        } 
+        }
 
         public static Money operator +(Money summand1, Money summand2) => summand1.Add(summand2);
 
