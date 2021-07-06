@@ -84,10 +84,10 @@ namespace Marketplace.Domain
                     State = ClassifiedAdState.Inactive;
                     break;
                 case Events.ClassifiedAdTitleChanged e:
-                    Title = ClassifiedAdTitle.FromString(e.Title);
+                    Title = new ClassifiedAdTitle(e.Title);
                     break;
                 case Events.ClassifiedAdTextUpdated e:
-                    Text = ClassifiedAdText.FromString(e.AdText);
+                    Text = new ClassifiedAdText(e.AdText);
                     break;
                 case Events.ClassifiedAdPriceUpdated e:
                     Price = new Price(e.Price, e.CurrencyCode);
