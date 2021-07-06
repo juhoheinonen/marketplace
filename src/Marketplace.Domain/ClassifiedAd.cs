@@ -23,13 +23,26 @@ namespace Marketplace.Domain
             Id = id;
             OwnerId = ownerId;
             State = ClassifiedAdState.Inactive;
+            EnsureValidState();
         }
 
-        public void SetTitle(ClassifiedAdTitle title) => Title = title;
+        public void SetTitle(ClassifiedAdTitle title)
+        {
+            Title = title;
+            EnsureValidState();
+        }
 
-        public void UpdateText(ClassifiedAdText text) => Text = text;
+        public void UpdateText(ClassifiedAdText text)
+        {
+            Text = text;
+            EnsureValidState();
+        }
 
-        public void UpdatePrice(Price price) => Price = price;
+        public void UpdatePrice(Price price)
+        {
+            Price = price;
+            EnsureValidState();
+        }
 
         public void RequestToPublish()
         {
@@ -49,6 +62,7 @@ namespace Marketplace.Domain
             }
 
             State = ClassifiedAdState.PendingReview;
+            EnsureValidState();
         }
 
         public enum ClassifiedAdState
@@ -57,6 +71,19 @@ namespace Marketplace.Domain
             Active,
             Inactive,
             MarkedAsSold
+        }
+
+        private void EnsureValidState()
+        {
+            var valid = Id != null && OwnerId != null &&
+            (State switch
+            {
+                ClassifiedAdState.PendingReview =>
+                    Title != null && Text != null && Price?.Amount > 0,
+                ClassifiedAdState.Active =>
+                    Title != null && Text != null && Price?.Amount > 0 && ApprovedBy != null,
+                _ => true
+            });
         }
     }
 }
