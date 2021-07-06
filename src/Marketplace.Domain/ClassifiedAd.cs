@@ -84,6 +84,10 @@ namespace Marketplace.Domain
                     Title != null && Text != null && Price?.Amount > 0 && ApprovedBy != null,
                 _ => true
             });
+
+            if (!valid) {
+                throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");
+            }
         }
     }
 }
