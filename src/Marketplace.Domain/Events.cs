@@ -29,7 +29,7 @@ namespace Marketplace.Domain
             public string CurrencyCode { get; set; }
         }
 
-        public class ClassidiedAdSentForReview
+        public class ClassifiedAdSentForReview
         {
             public Guid Id { get; set; }
         }
