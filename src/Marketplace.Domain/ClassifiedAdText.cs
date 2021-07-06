@@ -6,6 +6,8 @@ namespace Marketplace.Domain
     {      
         public static ClassifiedAdText FromString(string text) => new ClassifiedAdText(text);
 
+        public static implicit operator string(ClassifiedAdText self) => self._value;
+
         private readonly string _value;
 
         private ClassifiedAdText(string text)

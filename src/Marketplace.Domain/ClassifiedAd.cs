@@ -2,7 +2,7 @@
 
 namespace Marketplace.Domain
 {
-    public class ClassifiedAd: Entity
+    public class ClassifiedAd : Entity
     {
         public ClassifiedAdId Id { get; }
 
@@ -25,7 +25,8 @@ namespace Marketplace.Domain
             State = ClassifiedAdState.Inactive;
             EnsureValidState();
 
-            Raise(new Events.ClassifiedAdCreated {
+            Raise(new Events.ClassifiedAdCreated
+            {
                 Id = id,
                 OwnerId = ownerId
             });
@@ -36,7 +37,8 @@ namespace Marketplace.Domain
             Title = title;
             EnsureValidState();
 
-            Raise(new Events.ClassifiedAdTitleChanged {
+            Raise(new Events.ClassifiedAdTitleChanged
+            {
                 Id = Id,
                 Title = title
             });
@@ -46,12 +48,25 @@ namespace Marketplace.Domain
         {
             Text = text;
             EnsureValidState();
+
+            Raise(new Events.ClassifiedAdTextUpdated
+            {
+                Id = Id,
+                AdText = text
+            });
         }
 
         public void UpdatePrice(Price price)
         {
             Price = price;
             EnsureValidState();
+
+            Raise(new Events.ClassifiedAdPriceUpdated
+            {
+                Id = Id,
+                Price = price.Amount,
+                CurrencyCode = price.Currency.CurrencyCode
+            });
         }
 
         public void RequestToPublish()
@@ -73,6 +88,11 @@ namespace Marketplace.Domain
 
             State = ClassifiedAdState.PendingReview;
             EnsureValidState();
+
+            Raise(new Events.ClassifiedAdSentForReview()
+            {
+                Id = Id
+            });
         }
 
         public enum ClassifiedAdState
@@ -95,7 +115,8 @@ namespace Marketplace.Domain
                 _ => true
             });
 
-            if (!valid) {
+            if (!valid)
+            {
                 throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");
             }
         }
