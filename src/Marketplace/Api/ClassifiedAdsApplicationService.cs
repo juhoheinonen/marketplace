@@ -5,6 +5,8 @@ namespace Marketplace.Api
 {
     public class ClassifiedAdsApplicationService : IApplicationService
     {
+        private readonly IEntityStore _store;
+
         public async Task Handle(object command)
         {
             switch (command)
