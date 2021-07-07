@@ -13,9 +13,9 @@ namespace Marketplace.Framework
         {
             When(@event);
             EnsureValidState();
-            _events.Add(@event);            
+            _events.Add(@event);
         }
-        
+
         public IEnumerable<object> GetChanges() => _events.AsEnumerable();
 
         public void ClearChanges() => _events.Clear();
