@@ -17,58 +17,39 @@ namespace Marketplace.Api
             _currencyLookup = currencyLookup;
         }
 
-        public async Task Handle(object command)
-        {
-            ClassifiedAd classifiedAd;
-            switch (command)
+        public Task Handle(object command) =>
+            command switch
             {
-                case V1.Create cmd:
-                    if (await _store.Exists<ClassifiedAd>(cmd.Id.ToString()))
-                    {
-                        throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
-                    }
-                    classifiedAd = new ClassifiedAd(new ClassifiedAdId(cmd.Id), new UserId(cmd.OwnerId));
-                    await _store.Save(classifiedAd);
-                    break;
-                case V1.SetTitle cmd:
-                    classifiedAd = await _store.Load<ClassifiedAd>(cmd.Id.ToString());
-                    if (classifiedAd == null)
-                    {
-                        throw new InvalidOperationException($"Entity with id {cmd.Id} cannet be found");
-                    }
-                    classifiedAd.SetTitle(ClassifiedAdTitle.FromString(cmd.Title));
-                    await _store.Save(classifiedAd);
-                    break;
-                case V1.UpdateText cmd:
-                    classifiedAd = await _store.Load<ClassifiedAd>(cmd.Id.ToString());
-                    if (classifiedAd == null)
-                    {
-                        throw new InvalidOperationException($"Entity with id {cmd.Id} cannet be found");
-                    }
-                    classifiedAd.UpdateText(ClassifiedAdText.FromString(cmd.Text));
-                    await _store.Save(classifiedAd);
-                    break;
-                case V1.UpdatePrice cmd:
-                    classifiedAd = await _store.Load<ClassifiedAd>(cmd.Id.ToString());
-                    if (classifiedAd == null)
-                    {
-                        throw new InvalidOperationException($"Entity with id {cmd.Id} cannet be found");
-                    }
-                    classifiedAd.UpdatePrice(Price.FromDecimal(cmd.Price, cmd.Currency, _currencyLookup);
-                    await _store.Save(classifiedAd);
-                    break;
-                case V1.RequestToPublish cmd:
-                    classifiedAd = await _store.Load<ClassifiedAd>(cmd.Id.ToString());
-                    if (classifiedAd == null)
-                    {
-                        throw new InvalidOperationException($"Entity with id {cmd.Id} cannet be found");
-                    }
-                    classifiedAd.RequestToPublish();
-                    await _store.Save(classifiedAd);
-                    break;
-                default:
-                    throw new InvalidOperationException($"The command {command.GetType().FullName} is unknown");
+                V1.Create cmd => HandleCreate(cmd),
+                V1.SetTitle cmd => HandleUpdate(cmd.Id, c => c.SetTitle(ClassifiedAdTitle.FromString(cmd.Title))),
+                V1.UpdateText cmd => HandleUpdate(cmd.Id, c => c.UpdateText(ClassifiedAdText.FromString(cmd.Text))),
+                V1.UpdatePrice cmd => HandleUpdate(cmd.Id, c => c.UpdatePrice(Price.FromDecimal(cmd.Price, cmd.Currency, _currencyLookup))),
+                V1.RequestToPublish cmd => HandleUpdate(cmd.Id, c => c.RequestToPublish()),
+                _ => Task.CompletedTask
+            };
+
+        private async Task HandleCreate(V1.Create cmd)
+        {
+            if (await _store.Exists<ClassifiedAd>(cmd.Id.ToString()))
+            {
+                throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
             }
+            var classifiedAd = new ClassifiedAd(new ClassifiedAdId(cmd.Id), new UserId(cmd.OwnerId));
+            await _store.Save(classifiedAd);
+        }
+
+        private async Task HandleUpdate(Guid classifiedAdId, Action<ClassifiedAd> operation)
+        {
+            var classifiedAd = await _store.Load<ClassifiedAd>(classifiedAdId.ToString());
+
+            if (classifiedAd == null)
+            {
+                throw new InvalidOperationException($"Entity with id {classifiedAdId} cannot be found");
+            }
+
+            operation(classifiedAd);
+
+            await _store.Save(classifiedAd);
         }
     }
 }
